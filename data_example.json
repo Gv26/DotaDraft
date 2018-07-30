@@ -1,0 +1,47 @@
+{
+    "data_size": 2
+    "matches": [
+        {
+            "match_id": 0
+            "match_seq_num": 0
+            "radiant_win": false
+            "game_mode": 0
+            "lobby_type": 0
+            "picks_bans": [
+                {
+                    "is_pick": false,
+                    "hero_id": 99,
+                    "team": 1,
+                    "order": 0
+                }
+                {
+                    "is_pick": false,
+                    "hero_id": 56,
+                    "team": 0,
+                    "order": 1
+                }
+            ]
+        }
+        {
+            "match_id": 1
+            "match_seq_num": 1
+            "radiant_win": true
+            "game_mode": 1
+            "lobby_type": 1
+            "picks_bans": [
+                {
+                    "is_pick": false,
+                    "hero_id": 12,
+                    "team": 0,
+                    "order": 5
+                }
+                {
+                    "is_pick": true,
+                    "hero_id": 27,
+                    "team": 1,
+                    "order": 6
+                }
+            ]
+        }
+    ]
+}
