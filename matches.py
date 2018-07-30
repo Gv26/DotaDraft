@@ -35,7 +35,7 @@ def get_match_details(match_id):
 
     https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails
     """
-    base = 'http://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v1'
+    base = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v1'
     payload = {'key': config.STEAM_API_KEY, 'match_id': match_id}
     global last_call_steam
     response, last_call_steam = rate_limited(REQUEST_PERIOD_STEAM, last_call_steam, requests.get, base, params=payload)
@@ -47,7 +47,7 @@ def get_match_history(**kwargs):
 
     https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistory
     """
-    base = 'http://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v1'
+    base = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/v1'
     if 'key' not in kwargs:
         kwargs['key'] = config.STEAM_API_KEY
     global last_call_steam
@@ -60,7 +60,7 @@ def get_match_history_by_seq_num(start_at_match_seq_num, matches_requested=100):
 
     https://wiki.teamfortress.com/wiki/WebAPI/GetMatchHistoryBySequenceNum
     """
-    base = 'http://api.steampowered.com/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v1'
+    base = 'https://api.steampowered.com/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v1'
     payload = {'key': config.STEAM_API_KEY, 'start_at_match_seq_num': start_at_match_seq_num,
                'matches_requested': matches_requested}
     global last_call_steam
