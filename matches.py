@@ -1,7 +1,9 @@
 """Retrieves Dota match data and outputs it to file as JSON."""
 import json
-import requests
 import time
+
+import requests
+
 import config
 
 REQUEST_PERIOD_OPENDOTA = 1  # seconds
@@ -25,7 +27,7 @@ def rate_limited(request_period, last_call_time, request_function, *args, **kwar
         status = response.status_code
         if status != 429:  # Too Many Requests
             break
-        print('HTTP status code: {}. Waiting before retrying.'.format(status), end='\r')
+        print('HTTP status code: {}. Waiting before retrying.'.format(status), end='\n')
         time.sleep(30)
     return response, last_call_time
 
@@ -185,10 +187,9 @@ def fetch_matches(game_mode, lobby_type, human_players=10, start_match_id=None, 
     try:
         with open('data.json') as data:
             database = json.load(data)
-            data_size = database['data_size']
-            matches = database['matches']
+        data_size = database['data_size']
+        matches = database['matches']
     except FileNotFoundError:
-        database = {'matches': []}
         data_size = 0
         matches = []
     match_id_set = {m['match_id'] for m in matches}
@@ -224,9 +225,11 @@ def fetch_matches(game_mode, lobby_type, human_players=10, start_match_id=None, 
 
             # Write database to file for every API response that gives new matches.
             if new_matches:
-                database['data_size'] = data_size + num_matches_fetched
-                database['matches'].extend(new_matches)
-                write_data('data.json', database)
+                with open('data.json') as data:
+                    construct = json.load(data)
+                construct['data_size'] = data_size + num_matches_fetched
+                construct['matches'].extend(new_matches)
+                write_data('data.json', construct)
 
             # Stop gathering data after reaching the most recent matches played.
             if len(api_matches) < matches_requested:
@@ -235,7 +238,7 @@ def fetch_matches(game_mode, lobby_type, human_players=10, start_match_id=None, 
 
             # Print completion details about data fetched so far.
             completion = 100 * (seq_num - search_start_seq_num) / (end_search_seq_num - search_start_seq_num)
-            print('Progress: {:6.6}% (sequence number {:>11})'.format(str(completion), seq_num), end='\r')
+            print('Progress: {:6.6}% (sequence number {:>11})'.format(str(completion), seq_num), end='\n')
         else:
             print('Sequence number {} statusDetail: {}'.format(seq_num, result['statusDetail']))
             seq_num += 1
