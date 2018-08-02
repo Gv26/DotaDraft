@@ -25,10 +25,11 @@ def rate_limited(request_period, last_call_time, request_function, *args, **kwar
         response = request_function(*args, **kwargs)
         last_call_time = time.perf_counter()
         status = response.status_code
-        if status != 429:  # Too Many Requests
-            break
-        print('HTTP status code: {}. Waiting before retrying.'.format(status), end='\n')
-        time.sleep(30)
+        if status == 429 or status == 503:  # 429 Too Many Requests, 503 Service Unavailable.
+            print('HTTP status code: {}. Waiting before retrying.'.format(status), end='\n')
+            time.sleep(30)
+            continue
+        break
     return response, last_call_time
 
 
@@ -201,7 +202,8 @@ def fetch_matches(game_mode, lobby_type, human_players=10, start_match_id=None, 
     while seq_num < end_search_seq_num:
         new_matches = []
         response = get_match_history_by_seq_num(seq_num, matches_requested)
-        result = response.json()['result']
+        decoded_response = response.json()
+        result = decoded_response['result']
         # Check that response contains good data.
         if result['status'] == 1:
             # Add matches to database if specified conditions are met.
@@ -210,14 +212,11 @@ def fetch_matches(game_mode, lobby_type, human_players=10, start_match_id=None, 
                 match_id = m['match_id']
                 match_seq_num = m['match_seq_num']
 
-                # Conditions:
-                mode = m['game_mode'] == game_mode
-                lobby = m['lobby_type'] == lobby_type
-                id_range = start_match_id <= match_id <= end_match_id
-                players = m['human_players'] == human_players
-                new_id = match_id not in match_id_set
+                conditions = (m['game_mode'] == game_mode and m['lobby_type'] == lobby_type and
+                              start_match_id <= match_id <= end_match_id and m['human_players'] == human_players and
+                              match_id not in match_id_set)
 
-                if mode and lobby and id_range and players and new_id:
+                if conditions:
                     match = {'match_id': match_id, 'match_seq_num': match_seq_num, 'radiant_win': m['radiant_win'],
                              'game_mode': game_mode, 'lobby_type': lobby_type, 'picks_bans': m['picks_bans']}
                     new_matches.append(match)
@@ -225,8 +224,11 @@ def fetch_matches(game_mode, lobby_type, human_players=10, start_match_id=None, 
 
             # Write database to file for every API response that gives new matches.
             if new_matches:
-                with open('data.json') as data:
-                    construct = json.load(data)
+                try:
+                    with open('data.json') as data:
+                        construct = json.load(data)
+                except FileNotFoundError:
+                    construct = {'matches': []}
                 construct['data_size'] = data_size + num_matches_fetched
                 construct['matches'].extend(new_matches)
                 write_data('data.json', construct)

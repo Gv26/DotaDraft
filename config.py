@@ -9,5 +9,5 @@ lobby_type = 7  # Ranked
 human_players = 10
 
 # Match IDs to search. Set to None for first match of patch and most recent match respectively.
-start_match_id = 4018542266  # Patch 7.18 begins on match 3969653344.
-end_match_id = 4030199489
+start_match_id = 4032019767  # Patch 7.19 begins on match 4032019767.
+end_match_id = 4036846609
