@@ -89,7 +89,7 @@ def write_data(filename, data):
 
 
 def latest_match_id():
-    """Return the latest valid match ID."""
+    """Return the match ID of the most recently played match."""
     for attempt in range(5):
         latest_match = get_match_history(matches_requested=1)
         request_status = latest_match.status_code
@@ -103,6 +103,15 @@ def latest_match_id():
                 break
         else:
             print('latest_match_id exceeded maximum number of attempts. HTTP status code: {}.'.format(request_status))
+
+
+def greatest_database_seq_num(filename):
+    """Return the greatest match sequence number stored in the local database."""
+    with open(filename) as data:
+        database = json.load(data)
+    matches = database['matches']
+    match_seq_nums = [m['match_seq_num'] for m in matches]
+    return max(match_seq_nums)
 
 
 def current_patch_match_id():
@@ -159,16 +168,28 @@ def current_patch_match_id():
     return match_id_upper
 
 
-def fetch_matches(game_mode, lobby_type, human_players=10, start_match_id=None, end_match_id=None):
+def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match_id=None, end_match_id=None):
     """Fetch matches and write data to file if specified conditions are met."""
-    # Setup valid start_match and end_match.
-    if start_match_id is None:
-        start_match_id = current_patch_match_id()
-    start_match = get_match_details(start_match_id)
-    start_match_result = start_match.json()['result']
-    if 'error' in start_match_result:
-        print('start_match_id: ' + start_match_result['error'])
-        return
+    max_match_length = 18000  # seconds
+    # Setup start sequence number.
+    if start_match_id == 'latest':
+        try:
+            search_start_seq_num = greatest_database_seq_num(filename)
+        except FileNotFoundError:
+            print("No existing data found. Cannot use start_match_id = 'latest' in config.")
+            return
+    else:
+        if start_match_id is None:
+            start_match_id = current_patch_match_id()
+        start_match = get_match_details(start_match_id)
+        start_match_result = start_match.json()['result']
+        if 'error' in start_match_result:
+            print('start_match_id: ' + start_match_result['error'])
+            return
+        start_seq_num = start_match_result['match_seq_num']
+        search_start_seq_num = start_seq_num - max_match_length
+
+    # Setup end sequence number.
     if end_match_id is None:
         end_match_id = latest_match_id()
     end_match = get_match_details(end_match_id)
@@ -176,17 +197,12 @@ def fetch_matches(game_mode, lobby_type, human_players=10, start_match_id=None, 
     if 'error' in end_match_result:
         print('end_match_id: ' + end_match_result['error'])
         return
-
-    # Setup sequence numbers.
-    max_match_length = 18000  # seconds
-    start_seq_num = start_match_result['match_seq_num']
-    search_start_seq_num = start_seq_num - max_match_length
     end_seq_num = end_match_result['match_seq_num']
     end_search_seq_num = end_seq_num + max_match_length
 
     # Read existing data.
     try:
-        with open('data.json') as data:
+        with open(filename) as data:
             database = json.load(data)
         data_size = database['data_size']
         matches = database['matches']
@@ -225,13 +241,13 @@ def fetch_matches(game_mode, lobby_type, human_players=10, start_match_id=None, 
             # Write database to file for every API response that gives new matches.
             if new_matches:
                 try:
-                    with open('data.json') as data:
+                    with open(filename) as data:
                         construct = json.load(data)
                 except FileNotFoundError:
                     construct = {'matches': []}
                 construct['data_size'] = data_size + num_matches_fetched
                 construct['matches'].extend(new_matches)
-                write_data('data.json', construct)
+                write_data(filename, construct)
 
             # Stop gathering data after reaching the most recent matches played.
             if len(api_matches) < matches_requested:
@@ -250,4 +266,10 @@ def fetch_matches(game_mode, lobby_type, human_players=10, start_match_id=None, 
 
 
 if __name__ == '__main__':
-    fetch_matches(config.game_mode, config.lobby_type, config.human_players, config.start_match_id, config.end_match_id)
+    file = config.DATA_FILE
+    mode = config.game_mode
+    lobby = config.lobby_type
+    players = config.human_players
+    start_id = config.start_match_id
+    end_id = config.end_match_id
+    fetch_matches(file, mode, lobby, players, start_id, end_id)
