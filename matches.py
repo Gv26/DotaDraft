@@ -114,6 +114,15 @@ def greatest_database_seq_num(filename):
     return max(match_seq_nums)
 
 
+def smallest_database_match_id(filename):
+    """Return the smallest match ID stored in the local database."""
+    with open(filename) as data:
+        database = json.load(data)
+    matches = database['matches']
+    match_ids = [m['match_id'] for m in matches]
+    return min(match_ids)
+
+
 def current_patch_match_id():
     """Return the match ID for the first match of the current patch.
 
@@ -178,7 +187,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
         except FileNotFoundError:
             print("No existing data found. Cannot use start_match_id = 'latest' in config.")
             return
-        start_match_id = 0
+        start_match_id = smallest_database_match_id(filename)
     else:
         if start_match_id is None:
             start_match_id = current_patch_match_id()
@@ -267,10 +276,10 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
 
 
 if __name__ == '__main__':
-    file = config.DATA_FILE
+    fn = config.DATA_FILE
     mode = config.game_mode
     lobby = config.lobby_type
     players = config.human_players
     start_id = config.start_match_id
     end_id = config.end_match_id
-    fetch_matches(file, mode, lobby, players, start_id, end_id)
+    fetch_matches(fn, mode, lobby, players, start_id, end_id)
