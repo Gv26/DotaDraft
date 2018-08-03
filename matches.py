@@ -178,6 +178,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
         except FileNotFoundError:
             print("No existing data found. Cannot use start_match_id = 'latest' in config.")
             return
+        start_match_id = 0
     else:
         if start_match_id is None:
             start_match_id = current_patch_match_id()
