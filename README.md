@@ -10,4 +10,4 @@ In order to fetch new match data for training, `STEAM_API_KEY` must be set to yo
 
 Run `python matches.py` and new matches will begin to be fetched (this is very slow).
 
-Run `python process.py` to output a file containing the data in a format ready for use as training data.
+Run `python process.py` to generate a file containing the data in a format ready for use as training data.
