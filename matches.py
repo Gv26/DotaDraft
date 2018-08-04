@@ -5,6 +5,7 @@ import time
 import requests
 
 import config
+from process import write_json_data
 
 REQUEST_PERIOD_OPENDOTA = 1  # seconds
 REQUEST_PERIOD_STEAM = 1  # seconds
@@ -26,7 +27,7 @@ def rate_limited(request_period, last_call_time, request_function, *args, **kwar
         last_call_time = time.perf_counter()
         status = response.status_code
         if status == 429 or status == 503:  # 429 Too Many Requests, 503 Service Unavailable.
-            print('HTTP status code: {}. Waiting before retrying.'.format(status), end='\n')
+            print('HTTP status code: {}. Waiting before retrying.'.format(status))
             time.sleep(30)
             continue
         break
@@ -81,11 +82,6 @@ def get_opendota_match(match_id):
     global last_call_opendota
     response, last_call_opendota = rate_limited(REQUEST_PERIOD_OPENDOTA, last_call_opendota, requests.get, request_url)
     return response
-
-
-def write_data(filename, data):
-    with open(filename, 'w') as f:
-        json.dump(data, f)
 
 
 def latest_match_id():
@@ -173,7 +169,7 @@ def current_patch_match_id():
         else:
             print('Failed to find first match ID of current patch.')
             return
-    print('Fetched patch match ID (' + str(match_id_upper) + '). ' + str(api_calls) + ' OpenDota API calls made.')
+    print('Fetched patch match ID ({}). {} OpenDota API calls made.'.format(match_id_upper, api_calls))
     return match_id_upper
 
 
@@ -185,7 +181,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
         try:
             search_start_seq_num = greatest_database_seq_num(filename)
         except FileNotFoundError:
-            print("No existing data found. Cannot use start_match_id = 'latest' in config.")
+            print("{} not found. Cannot use start_match_id = 'latest' in config.".format(filename))
             return
         start_match_id = smallest_database_match_id(filename)
     else:
@@ -222,6 +218,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
     match_id_set = {m['match_id'] for m in matches}
 
     matches_requested = 100
+    no_abandon_leaver_status = {0, 1}
     num_matches_fetched = 0
     seq_num = search_start_seq_num
     # Loop through GetMatchHistoryBySequenceNum responses from smallest to largest sequence number.
@@ -243,10 +240,22 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
                               match_id not in match_id_set)
 
                 if conditions:
-                    match = {'match_id': match_id, 'match_seq_num': match_seq_num, 'radiant_win': m['radiant_win'],
-                             'game_mode': game_mode, 'lobby_type': lobby_type, 'picks_bans': m['picks_bans']}
-                    new_matches.append(match)
-                    num_matches_fetched += 1
+                    # Check for leavers.
+                    for p in m['players']:
+                        try:
+                            if p['leaver_status'] not in no_abandon_leaver_status:
+                                leavers = True
+                                break
+                        except KeyError:  # Bots do not have key 'leaver_status'.
+                            continue
+                    else:
+                        leavers = False
+
+                    if not leavers:
+                        match = {'match_id': match_id, 'match_seq_num': match_seq_num, 'radiant_win': m['radiant_win'],
+                                 'game_mode': game_mode, 'lobby_type': lobby_type, 'picks_bans': m['picks_bans']}
+                        new_matches.append(match)
+                        num_matches_fetched += 1
 
             # Write database to file for every API response that gives new matches.
             if new_matches:
@@ -257,7 +266,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
                     construct = {'matches': []}
                 construct['data_size'] = data_size + num_matches_fetched
                 construct['matches'].extend(new_matches)
-                write_data(filename, construct)
+                write_json_data(filename, construct)
 
             # Stop gathering data after reaching the most recent matches played.
             if len(api_matches) < matches_requested:
@@ -266,7 +275,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
 
             # Print completion details about data fetched so far.
             completion = 100 * (seq_num - search_start_seq_num) / (end_search_seq_num - search_start_seq_num)
-            print('Progress: {:6.6}% (sequence number {:>11})'.format(str(completion), seq_num), end='\n')
+            print('Progress: {:6.6}% (sequence number {:>11})'.format(str(completion), seq_num))
         else:
             print('Sequence number {} statusDetail: {}'.format(seq_num, result['statusDetail']))
             seq_num += 1
