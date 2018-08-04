@@ -15,7 +15,7 @@ def match_id_condition(match_id, start, end):
     elif start is not None and end is not None:
         return start <= match_id <= end
     elif start is not None and end is None:
-        return start <= match_id
+        return match_id >= start
     else:
         return match_id <= end
 
