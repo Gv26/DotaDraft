@@ -20,21 +20,20 @@ def match_id_condition(match_id, start, end):
         return match_id <= end
 
 
-def process_data(in_file, out_file, start_match_id, end_match_id):
+def process_data(input_file, output_file, start_match_id, end_match_id):
     """Convert raw data into format suitable for training and write this data to file.
 
     Overwrite existing training data file.
     """
     try:
-        with open(in_file) as data_file:
+        with open(input_file) as data_file:
             in_data = json.load(data_file)
     except FileNotFoundError:
-        print('{} not found.'.format(in_file))
+        print('{} not found.'.format(input_file))
         return
     data = []
     labels = []
     match_ids = []
-
     for m in in_data['matches']:
         match_id = m['match_id']
         if match_id_condition(match_id, start_match_id, end_match_id):
@@ -46,16 +45,18 @@ def process_data(in_file, out_file, start_match_id, end_match_id):
                 first_choice_win = 1
             else:
                 first_choice_win = 0
-            picks_bans_heroes = [p['hero_id'] for p in picks_bans]
-            data.append(picks_bans_heroes)
+            heroes_seq = [p['hero_id'] for p in picks_bans]
+            seq_len = len(heroes_seq)
+            sequence = [[heroes_seq[i] if i in range(s) else 0 for i in range(seq_len)] for s in range(1, seq_len + 1)]
+            data.append(sequence)
             labels.append(first_choice_win)
             match_ids.append(match_id)
     processed = {'data': data, 'labels': labels, 'match_ids': match_ids}
-    write_json_data(out_file, processed)
+    write_json_data(output_file, processed)
 
 
 if __name__ == '__main__':
-    in_file = config.DATA_FILE
+    in_file = config.MATCH_DATA_FILE
     out_file = config.TRAINING_DATA_FILE
     start_id = config.training_start_match_id
     end_id = config.training_end_match_id

@@ -288,7 +288,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
 
 
 if __name__ == '__main__':
-    fn = config.DATA_FILE
+    fn = config.MATCH_DATA_FILE
     mode = config.game_mode
     lobby = config.lobby_type
     players = config.human_players

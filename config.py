@@ -3,7 +3,7 @@
 STEAM_API_KEY = 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 
 # Name of file in which to store raw data.
-DATA_FILE = 'matches.json'
+MATCH_DATA_FILE = 'matches.json'
 
 # Filtering parameters for fetching match data. Values as stated at:
 # https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails#Result_data
