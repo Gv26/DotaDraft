@@ -8,6 +8,8 @@ You can configure DotaDraft by editing the parameters in `config.py`.
 ### Getting training data
 In order to fetch new match data for training, `STEAM_API_KEY` must be set to your [Steam Web API key](https://steamcommunity.com/dev/apikey) in `config.py`.
 
+To make sure the hero information is up-to-date, run `python heroes.py`.
+
 Run `python matches.py` and new matches will begin to be fetched (this is very slow) and output to file as JSON.
 
 The data is formatted as
