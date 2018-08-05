@@ -228,8 +228,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
     while seq_num < end_search_seq_num:
         new_matches = []
         response = get_match_history_by_seq_num(seq_num, matches_requested)
-        decoded_response = response.json()
-        result = decoded_response['result']
+        result = response.json()['result']
         # Check that response contains good data.
         if result['status'] == 1:
             # Add matches to database if specified conditions are met.
@@ -238,7 +237,13 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
                 match_id = m['match_id']
                 match_seq_num = m['match_seq_num']
 
-                conditions = (m['game_mode'] == game_mode and m['lobby_type'] == lobby_type and
+                # Conditions:
+                match_lobby_type = m['lobby_type']
+                try:
+                    lobby_condition = match_lobby_type in lobby_type
+                except TypeError:
+                    lobby_condition = match_lobby_type == lobby_type
+                conditions = (lobby_condition and m['game_mode'] == game_mode and
                               start_match_id <= match_id <= end_match_id and m['human_players'] == human_players and
                               match_id not in match_id_set)
 

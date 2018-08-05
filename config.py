@@ -8,7 +8,8 @@ MATCH_DATA_FILE = 'matches.json'
 # Filtering parameters for fetching match data. Values as stated at:
 # https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails#Result_data
 game_mode = 2  # Captains mode
-lobby_type = 7  # Ranked
+# Can specify multiple lobby types by comma separating values.
+lobby_type = 7  # 0 public matchmaking, 7 ranked.
 human_players = 10
 
 # Match IDs from which to fetch data.
