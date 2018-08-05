@@ -25,3 +25,8 @@ TRAINING_DATA_FILE = 'training_data.json'
 training_start_match_id = None
 # Set "training_end_match_id = None" for no restriction on end.
 training_end_match_id = None
+
+# Language for hero names.
+LANGUAGE = 'english'
+# Name of file in which to store hero data.
+HERO_DATA_FILE = 'heroes.json'

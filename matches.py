@@ -95,10 +95,13 @@ def latest_match_id():
                 latest_id = result['matches'][0]['match_id']
                 return latest_id
             else:
-                print('statusDetail: ' + result['statusDetail'])
+                print('latest_match_id statusDetail: ' + result['statusDetail'])
                 break
         else:
-            print('latest_match_id exceeded maximum number of attempts. HTTP status code: {}.'.format(request_status))
+            print('HTTP status code: {}. Waiting to retry...'.format(request_status))
+            time.sleep(30)
+    else:
+        raise requests.exceptions.RetryError('latest_match_id exceeded maximum number of attempts.')
 
 
 def greatest_database_seq_num(filename):
