@@ -227,7 +227,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
     # Loop through GetMatchHistoryBySequenceNum responses from smallest to largest sequence number.
     while seq_num < end_search_seq_num:
         new_matches = []
-        for attempt in range(5):
+        for attempt in range(20):
             try:
                 response = get_match_history_by_seq_num(seq_num, matches_requested)
                 decoded_response = response.json()
