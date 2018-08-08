@@ -261,7 +261,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
 
                     if not leavers:
                         match = {'match_id': match_id, 'match_seq_num': match_seq_num, 'radiant_win': m['radiant_win'],
-                                 'game_mode': game_mode, 'lobby_type': lobby_type, 'picks_bans': m['picks_bans']}
+                                 'game_mode': game_mode, 'lobby_type': match_lobby_type, 'picks_bans': m['picks_bans']}
                         new_matches.append(match)
                         num_matches_fetched += 1
 
