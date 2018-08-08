@@ -12,6 +12,9 @@ game_mode = 2  # Captains mode
 lobby_type = 0, 7  # 0 public matchmaking, 7 ranked.
 human_players = 10
 
+# Number of picks and bans in matches from the current patch.
+DRAFT_LENGTH = 22
+
 # Match IDs from which to fetch data.
 # Set "start_match_id = None" to find and use the first match of the current patch.
 # Set to "start_match_id = 'latest'" to use the most recent match stored in the local database.

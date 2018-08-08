@@ -245,7 +245,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
                     lobby_condition = match_lobby_type == lobby_type
                 conditions = (lobby_condition and m['game_mode'] == game_mode and
                               start_match_id <= match_id <= end_match_id and m['human_players'] == human_players and
-                              match_id not in match_id_set)
+                              len(m['picks_bans']) == config.DRAFT_LENGTH and match_id not in match_id_set)
 
                 if conditions:
                     # Check for leavers.

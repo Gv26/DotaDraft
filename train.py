@@ -90,7 +90,7 @@ if __name__ == '__main__':
     # seq_train, lab_train, seq_test, lab_test = split_data(sequence, label)
     seq_train, lab_train = load_data_full_drafts()
     print(seq_train[0].shape)
-    model = build_model(115, 22)
+    model = build_model(115, config.DRAFT_LENGTH)
     model.summary()
     model.fit(seq_train, lab_train, batch_size=128, epochs=20, validation_split=0.1)
 
