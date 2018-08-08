@@ -232,6 +232,8 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
                 response = get_match_history_by_seq_num(seq_num, matches_requested)
                 decoded_response = response.json()
             except json.JSONDecodeError:
+                print('JSONDecodeError. Waiting before retrying...')
+                time.sleep(30)
                 continue
             break
         else:
