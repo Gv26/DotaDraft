@@ -42,12 +42,10 @@ def process_data(input_file, output_file, start_match_id, end_match_id):
             first_choice_team = picks_bans[0]['team']
             radiant_win = m['radiant_win']
             if radiant_win and first_choice_team == 0 or not radiant_win and first_choice_team == 1:
-                first_choice_win = 1
+                first_choice_win = True
             else:
-                first_choice_win = 0
-            heroes_seq = [p['hero_id'] for p in picks_bans]
-            seq_len = len(heroes_seq)
-            sequence = [[heroes_seq[i] if i in range(s) else 0 for i in range(seq_len)] for s in range(1, seq_len + 1)]
+                first_choice_win = False
+            sequence = [p['hero_id'] for p in picks_bans]
             data.append(sequence)
             labels.append(first_choice_win)
             match_ids.append(match_id)

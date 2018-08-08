@@ -9,13 +9,13 @@ MATCH_DATA_FILE = 'matches.json'
 # https://wiki.teamfortress.com/wiki/WebAPI/GetMatchDetails#Result_data
 game_mode = 2  # Captains mode
 # Can specify multiple lobby types by comma separating values.
-lobby_type = 7  # 0 public matchmaking, 7 ranked.
+lobby_type = 0, 7  # 0 public matchmaking, 7 ranked.
 human_players = 10
 
 # Match IDs from which to fetch data.
-# Set "start_match_id = None" to find and use most recent match of the current patch.
+# Set "start_match_id = None" to find and use the first match of the current patch.
 # Set to "start_match_id = 'latest'" to use the most recent match stored in the local database.
-start_match_id = 'latest'  # Patch 7.19 begins on match 4032019767.
+start_match_id = None  # Patch 7.19 begins on match 4032019767.
 # Set "end_match_id = None" to use the most recent match played.
 end_match_id = None
 
