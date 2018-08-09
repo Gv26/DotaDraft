@@ -23,7 +23,12 @@ def rate_limited(request_period, last_call_time, request_function, *args, **kwar
         time_since_last_call = current_time - last_call_time
         if time_since_last_call < request_period:
             time.sleep(request_period - time_since_last_call)
-        response = request_function(*args, **kwargs)
+        try:
+            response = request_function(*args, **kwargs)
+        except requests.exceptions.ConnectionError:
+            print('ConnectionError. Waiting before retrying.')
+            time.sleep(30)
+            continue
         last_call_time = time.perf_counter()
         status = response.status_code
         if status == 429 or status == 503:  # 429 Too Many Requests, 503 Service Unavailable.
