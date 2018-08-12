@@ -286,7 +286,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
             final_loop = len(api_matches) < matches_requested or seq_num >= end_search_seq_num
 
             # Write database to file when enough matches have been fetched.
-            if new_matches_fetched >= 1000 or final_loop:
+            if new_matches_fetched >= 10 or final_loop:
                 try:
                     with open(filename) as data:
                         construct = json.load(data)
