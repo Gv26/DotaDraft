@@ -204,7 +204,7 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
         search_start_seq_num = start_seq_num - max_match_length
 
     # Setup end sequence number.
-    if end_match_id is None:
+    if end_match_id == 'latest':
         end_match_id = latest_match_id()
     end_match = get_match_details(end_match_id)
     end_match_result = end_match.json()['result']

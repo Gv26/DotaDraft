@@ -19,8 +19,8 @@ DRAFT_LENGTH = 22
 # Set "start_match_id = None" to find and use the first match of the current patch.
 # Set to "start_match_id = 'latest'" to use the most recent match stored in the local database.
 start_match_id = None  # Patch 7.19 begins on match 4032019767.
-# Set "end_match_id = None" to use the most recent match played.
-end_match_id = None
+# Set "end_match_id = 'latest'" to use the most recent match played.
+end_match_id = 'latest'
 
 # Name of file in which to store training data.
 TRAINING_DATA_FILE = 'training_data.json'
