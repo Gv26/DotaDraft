@@ -271,7 +271,8 @@ def fetch_matches(filename, game_mode, lobby_type, human_players=10, start_match
                                 leavers = True
                                 break
                         except KeyError:  # Bots do not have key 'leaver_status'.
-                            continue
+                            leavers = True
+                            break
                     else:
                         leavers = False
 
